@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "534574566293",
+    "project_id": "alal-49417",
+    "storage_bucket": "alal-49417.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:534574566293:android:c1c51d2fda77017aac449c",
+        "android_client_info": {
+          "package_name": "com.example.deneme1"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "534574566293-ipvp8s3in28esstf2p180sqpsvl099hm.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCtNLlGe1bMX6pvCUAKGes1ORScKO68Vk4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "534574566293-ipvp8s3in28esstf2p180sqpsvl099hm.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
