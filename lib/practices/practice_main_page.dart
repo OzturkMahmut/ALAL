@@ -1,13 +1,13 @@
 import 'package:animations/animations.dart';
-import 'package:deneme1/drops_snake_practice.dart';
-import 'package:deneme1/word_practice_slides.dart';
-import 'package:deneme1/word_practice_slides2.dart';
+import 'package:deneme1/practices/drops_snake_practice.dart';
+import 'package:deneme1/practices/word_practice_slides.dart';
+import 'package:deneme1/practices/word_practice_slides2.dart';
 import 'package:flutter/material.dart';
-import 'new_words_storage.dart';
-import 'word_card_widget.dart';
-import 'word_database.dart';
+import '../new_words_storage.dart';
+import '../word_card_widget.dart';
+import '../word_database.dart';
 import 'package:deneme1/themes/theme_colors.dart';
-import 'top_100_verbs.dart';
+import '../top_100_verbs.dart';
 
 void main() {
   runApp(

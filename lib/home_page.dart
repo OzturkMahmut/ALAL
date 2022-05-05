@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'add_word_v2.dart';
 import 'my_words/my_words_main.dart';
 import 'new_words_storage.dart';
-import 'practice_main_page.dart';
+import 'practices/practice_main_page.dart';
 import 'settings.dart';
 
 void main() {
