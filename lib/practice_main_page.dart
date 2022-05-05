@@ -1,4 +1,5 @@
 import 'package:animations/animations.dart';
+import 'package:deneme1/drops_snake_practice.dart';
 import 'package:deneme1/word_practice_slides.dart';
 import 'package:deneme1/word_practice_slides2.dart';
 import 'package:flutter/material.dart';
@@ -120,12 +121,12 @@ class _PracticeFulState extends State<PracticeFul> {
       ),
       floatingActionButton: FloatingActionButton.extended(
         //extended yapınca şekli değişti
-
+        heroTag: UniqueKey(),
         onPressed: () async {
           Navigator.push(
             context,
             MaterialPageRoute(
-                builder: (context) => const PracticeSlides2()),
+                builder: (context) => const DropsSnake()),
           );
           //await WordDatabase.instance.addColumn('isFav');
         },

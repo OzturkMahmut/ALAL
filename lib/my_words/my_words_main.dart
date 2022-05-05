@@ -4,6 +4,7 @@ import 'package:deneme1/my_words/my_words_fav_words_page.dart';
 import 'package:deneme1/my_words/my_words_search_page.dart';
 import 'package:flutter/material.dart';
 import '../add_word.dart';
+import '../add_word_v2.dart';
 import '../new_words_storage.dart';
 import '../word_database.dart';
 
@@ -96,7 +97,7 @@ class _MyWordsFulState extends State<MyWordsFul> {
           Navigator.push(
             context,
             MaterialPageRoute(
-                builder: (context) => AddWordFul(
+                builder: (context) => AddWord2Ful(
                       title: 'ALAL',
                       storage: WordStorage(),
                     )),

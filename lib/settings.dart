@@ -22,7 +22,6 @@ class SettingsPage extends StatelessWidget {
 }
 
 class SettingsPageFul extends StatefulWidget {
-
   const SettingsPageFul({
     Key? key,
   }) : super(key: key);
@@ -33,33 +32,20 @@ class SettingsPageFul extends StatefulWidget {
 
 class _SettingsPageFulState extends State<SettingsPageFul> {
   var checkSizes = [0.0, 0.0];
-    var button1 =              const NeumorphismButton(
-                height: 50,
-                width: 50,
-                color: CustomColors.terraCota,
+  var button1 = const NeumorphismButton(
+    height: 50,
+    width: 50,
+    color: CustomColors.terraCota,
+  );
 
-              );
+  @override void initState() {
+    checkSizes[currentTheme.currentThemeIndexData]=30.0;
+    super.initState();
+  }
+
+
   @override
   Widget build(BuildContext context) {
-    final settingsList = <_SettingsInfo>[
-      const _SettingsInfo(
-        Icons.person,
-        '',
-      ),
-      const _SettingsInfo(
-        Icons.notifications,
-        '',
-      ),
-      const _SettingsInfo(
-        Icons.security,
-        '',
-      ),
-      const _SettingsInfo(
-        Icons.help,
-        '',
-      ),
-    ];
-
     return Scaffold(
       appBar: AppBar(
         title: const Text(
@@ -136,38 +122,78 @@ class _SettingsPageFulState extends State<SettingsPageFul> {
             ],
           ),
           ListView(
+            padding: const EdgeInsets.all(8.0),
             shrinkWrap: true,
             children: [
-              for (var setting in settingsList) _SettingsTile(setting),
+              Column(
+                children: [
+                  InkWell(
+                    onTap: () {},
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.person,
+                          size: 30,
+                          color: Theme.of(context).colorScheme.background,
+                        ),
+                        const SizedBox(
+                          width: 20,
+                        ),
+                        Text(
+                          'Profile Settings',
+                          style: TextStyle(
+                            fontSize: 24,
+                            color: Theme.of(context).colorScheme.background,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Divider(
+                    thickness: 2,
+                    color: Theme.of(context).colorScheme.background,
+                  ),
+                  InkWell(
+                    onTap: () {},
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.format_paint_rounded,
+                          size: 30,
+                          color: Theme.of(context).colorScheme.background,
+                        ),
+                        const SizedBox(
+                          width: 20,
+                        ),
+                        Text(
+                          'Theme',
+                          style: TextStyle(
+                            fontSize: 24,
+                            color: Theme.of(context).colorScheme.background,
+                          ),
+                        ),
+                        IconButton(
+                          icon: Icon(
+                            Icons.format_paint_rounded,
+                            size: 30,
+                            color: Theme.of(context).colorScheme.background,
+                          ),
+                          onPressed: () {},
+                        )
+                      ],
+                    ),
+                  ),
+                  Divider(
+                    thickness: 2,
+                    color: Theme.of(context).colorScheme.background,
+                  ),
+                  
+                ],
+              ),
             ],
           ),
         ],
       ),
     );
   }
-}
-
-class _SettingsTile extends StatelessWidget {
-  const _SettingsTile(this.settingData);
-  final _SettingsInfo settingData;
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        ListTile(
-          leading: Icon(settingData.settingIcon),
-          title: Text(settingData.settingsLabel),
-        ),
-        const Divider(thickness: 2),
-      ],
-    );
-  }
-}
-
-class _SettingsInfo {
-  const _SettingsInfo(this.settingIcon, this.settingsLabel);
-
-  final IconData settingIcon;
-  final String settingsLabel;
 }

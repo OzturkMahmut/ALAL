@@ -8,19 +8,19 @@ import 'package:firebase_core/firebase_core.dart';
 import 'home_page.dart';
 import 'login_page.dart';
 import 'package:provider/provider.dart';
+import 'keys.dart';
 
-//TODO: USE CHIPS FOR THEME SELECTION
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   if (kIsWeb) {
     //webde açmak için
     await Firebase.initializeApp(
       options: const FirebaseOptions(
-        apiKey: 'AIzaSyA96ot8T-axGlIKm061bImJVQqzQN4_9vc',
-        appId: '1:534574566293:web:1cd923ebafcef7d7ac449c',
-        messagingSenderId: '534574566293',
-        projectId: 'alal-49417',
-        storageBucket: 'alal-49417.appspot.com',
+        apiKey: firebaseApiKey,
+        appId: firebaseAppId,
+        messagingSenderId: firebaseMessagingSenderId,
+        projectId: firebaseProjectId,
+        storageBucket: firebaseStorageBucket,
       ),
     );
   } else {
@@ -38,14 +38,21 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  // This widget is the root of your application.
+  late int themePref;
   @override
-  void initState() {
+  void initState()  {
     super.initState();
     currentTheme.addListener(() {
       setState(() {});
     });
+    themeData();
   }
+
+  Future<void> themeData() async {
+    themePref = await currentTheme.getPref();
+    currentTheme.chooseTheme(themePref);
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -58,7 +65,7 @@ class _MyAppState extends State<MyApp> {
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         title: 'ALAL',
-        theme: currentTheme.currentThemeDataa,
+        theme: currentTheme.getCurrentThemeData,
         darkTheme: CustomTheme.darkTheme,
         themeMode: currentTheme.currentThemeMode,
         home: StreamBuilder(
