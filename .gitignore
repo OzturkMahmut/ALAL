@@ -12,6 +12,8 @@
 lib/keys.dart
 lib/silinecek.dart
 
+
+
 # IntelliJ related
 *.iml
 *.ipr
