@@ -67,7 +67,7 @@ class _PracticeSlidesState2 extends State<PracticeSlides2> {
   }
 
   void changeWord(String direction)   {
-    if (inOrder) {
+    if (inOrder) {  //TODO: check whether this cond. must be reversed or not
       wordIndex = Random().nextInt(currentList.length - 1);
     } else {
       switch (direction) {

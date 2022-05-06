@@ -48,61 +48,11 @@ class _DropsSnakeState extends State<DropsSnake> {
     randomizedLetters[currentIndex] = currentWord.name[0];
     selectedLetters[currentIndex] = true;
     randomizeLetters();
-
     super.initState();
   }
 
-  void randomizeLetters() {
-    List<int> available;
-    int move;
 
-    for (var j = 1; j < currentWord.name.length; j++) {
-      if (currentIndex < row) {
-        if ((currentIndex + 1) % column == 0) {
-          available = [-1, row]; //top right
-        } else if (currentIndex % column == 0) {
-          available = [1, row]; //top left
-        } else {
-          available = [-1, 1, row]; //only top
-        }
-      } else if (currentIndex >= row * column - 1) {
-        if ((currentIndex + 1) % column == 0) {
-          available = [-1, -row]; //bottom right
-        } else if (currentIndex % column == 0) {
-          available = [1, -row]; //bottom left
-        } else {
-          available = [-1, 1, -row]; //only bottom
-        }
-      } else if ((currentIndex + 1) % column == 0) {
-        available = [-1, -row, row]; //only right
-      } else if (currentIndex % column == 0) {
-        available = [1, -row, row]; //only left
-      } else {
-        available = [-1, 1, -row, row]; //not edge
-      }
-
-      move = available[Random().nextInt(available.length - 1)];
-      nextIndex = currentIndex + move;
-      while (true) {
-        if (randomizedLetters[nextIndex] == " ") {
-          randomizedLetters[nextIndex] = currentWord.name[j];
-          break;
-        } else {
-          move = available[Random().nextInt(available.length - 1)];
-          nextIndex = currentIndex + move;
-        }
-      }
-      currentIndex = nextIndex;
-    }
-    for (var k = 0; k < randomizedLetters.length; k++) { //kelimeden sonra gridin geri kalanını doldurmak için
-      if (randomizedLetters[k] == " ") {
-        randomizedLetters[k] =
-            _germanLetters[Random().nextInt(_germanLetters.length - 1)];
-      }
-    }
-  }
-
-    void randomizeLetterstwo() {
+    void randomizeLetters() {
     List<int> available;
     int move;
 
@@ -137,10 +87,16 @@ class _DropsSnakeState extends State<DropsSnake> {
         }
       }
 
-      move = available[Random().nextInt(available.length - 1)];
-      nextIndex = currentIndex + move;
-      randomizedLetters[nextIndex] = currentWord.name[j];
-      currentIndex = nextIndex;
+      if(available.isNotEmpty){ 
+        move = available[available.length==1?0:Random().nextInt(available.length - 1)];
+        nextIndex = currentIndex + move;
+        randomizedLetters[nextIndex] = currentWord.name[j];
+        currentIndex = nextIndex;
+      }else { //if there is no available next move, fill the current box and fall back
+        randomizedLetters[currentIndex] =  _germanLetters[Random().nextInt(_germanLetters.length - 1)];
+        j--; //ya da -2 
+      }
+      
 
       
     }
@@ -150,6 +106,7 @@ class _DropsSnakeState extends State<DropsSnake> {
             _germanLetters[Random().nextInt(_germanLetters.length - 1)];
       }
     }
+    setState(() {});
   }
 
   void setPuzzle() {
@@ -161,7 +118,7 @@ class _DropsSnakeState extends State<DropsSnake> {
   }
 
   void changeWord(String direction) {
-    if (inOrder) {
+    if (!inOrder) {
       wordIndex = Random().nextInt(currentList.length - 1);
     } else {
       switch (direction) {
@@ -203,7 +160,7 @@ class _DropsSnakeState extends State<DropsSnake> {
         }
         break;
     }
-    wordIndex = 0;
+    wordIndex = Random().nextInt(currentList.length-1);
     currentWord = currentList[wordIndex];
   }
 
@@ -217,6 +174,8 @@ class _DropsSnakeState extends State<DropsSnake> {
       showSnackBar("Correct!", context);
       changeWord('next');
       selectedLetters.fillRange(0, selectedLetters.length - 1, false);
+      randomizedLetters = List.generate(25, (index) => ' ');
+      setPuzzle();
       setState(() {});
     }
   }
@@ -276,8 +235,9 @@ class _DropsSnakeState extends State<DropsSnake> {
                             UniqueKey(), //birden fazla olunca karışmasın diye
                         onPressed: () {
                           selectedLetters[index] = true;
-                          setState(() {});
+                          
                           checkWord(index);
+                          setState(() {});
                         },
                         backgroundColor: selectedLetters[index] == true
                             ? Colors.white.withOpacity(0.4)
