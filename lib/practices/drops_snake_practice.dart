@@ -33,6 +33,7 @@ class _DropsSnakeState extends State<DropsSnake> {
   int nextIndex = 0;
   late int startIndex;
   final String _germanLetters = 'abcdefghijklmnopqrstuvwxyzäöüß';
+  
 
   @override
   void initState() {
