@@ -29,11 +29,11 @@ class _DropsSnakeState extends State<DropsSnake> {
   String proN = '';
   List randomizedLetters = List.generate(25, (index) => ' '); //uzunluk 25
   List selectedLetters = List.generate(25, (index) => false);
+  List buttonClickable = List.generate(25, (index) => false);
   int currentIndex = 0;
   int nextIndex = 0;
   late int startIndex;
   final String _germanLetters = 'abcdefghijklmnopqrstuvwxyzäöüß';
-  
 
   @override
   void initState() {
@@ -44,16 +44,11 @@ class _DropsSnakeState extends State<DropsSnake> {
       });
     });
     selectList();
-    currentIndex = Random().nextInt(row * column - 1); //24
-    startIndex = currentIndex;
-    randomizedLetters[currentIndex] = currentWord.name[0];
-    selectedLetters[currentIndex] = true;
-    randomizeLetters();
+    setPuzzle();
     super.initState();
   }
 
-
-    void randomizeLetters() {
+  void randomizeLetters() {
     List<int> available;
     int move;
 
@@ -66,7 +61,7 @@ class _DropsSnakeState extends State<DropsSnake> {
         } else {
           available = [-1, 1, row]; //only top
         }
-      } else if (currentIndex >= row * column - 1) {
+      } else if (currentIndex >=(row-1) * column) {
         if ((currentIndex + 1) % column == 0) {
           available = [-1, -row]; //bottom right
         } else if (currentIndex % column == 0) {
@@ -82,26 +77,28 @@ class _DropsSnakeState extends State<DropsSnake> {
         available = [-1, 1, -row, row]; //not edge
       }
 
-      for(int l=0;l< available.length-1;l++){ //kutular boş mu diye kontrol ediyor
-        if (randomizedLetters[currentIndex+available[l]] != " "){
+      for (int l = 0; l < available.length; l++) {
+        //kutular boş mu diye kontrol ediyor
+        if (randomizedLetters[currentIndex + available[l]] != " ") {
           available.removeAt(l);
         }
       }
 
-      if(available.isNotEmpty){ 
-        move = available[available.length==1?0:Random().nextInt(available.length - 1)];
+      if (available.isNotEmpty) {
+        move = available[
+            available.length == 1 ? 0 : Random().nextInt(available.length - 1)];
         nextIndex = currentIndex + move;
         randomizedLetters[nextIndex] = currentWord.name[j];
         currentIndex = nextIndex;
-      }else { //if there is no available next move, fill the current box and fall back
-        randomizedLetters[currentIndex] =  _germanLetters[Random().nextInt(_germanLetters.length - 1)];
-        j--; //ya da -2 
+      } else {
+        //if there is no available next move, fill the current box and fall back
+        randomizedLetters[currentIndex] =
+            _germanLetters[Random().nextInt(_germanLetters.length - 1)];
+        j--; //ya da -2
       }
-      
-
-      
     }
-    for (var k = 0; k < randomizedLetters.length; k++) { //kelimeden sonra gridin geri kalanını doldurmak için
+    for (var k = 0; k < randomizedLetters.length; k++) {
+      //kelimeden sonra gridin geri kalanını doldurmak için
       if (randomizedLetters[k] == " ") {
         randomizedLetters[k] =
             _germanLetters[Random().nextInt(_germanLetters.length - 1)];
@@ -111,9 +108,42 @@ class _DropsSnakeState extends State<DropsSnake> {
   }
 
   void setPuzzle() {
+    List<int> availableTA;
     currentIndex = Random().nextInt(row * column - 1); //24
     startIndex = currentIndex;
     randomizedLetters[currentIndex] = currentWord.name[0];
+
+    // tekrara düştü
+    buttonClickable.fillRange(0, buttonClickable.length , false);
+        if (currentIndex < row) {
+        if ((currentIndex + 1) % column == 0) {
+          availableTA = [-1, row]; //top right
+        } else if (currentIndex % column == 0) {
+          availableTA = [1, row]; //top left
+        } else {
+          availableTA = [-1, 1, row]; //only top
+        }
+      } else if (currentIndex >= (row-1) * column) {
+        if ((currentIndex + 1) % column == 0) {
+          availableTA = [-1, -row]; //bottom right
+        } else if (currentIndex % column == 0) {
+          availableTA = [1, -row]; //bottom left
+        } else {
+          availableTA = [-1, 1, -row]; //only bottom
+        }
+      } else if ((currentIndex + 1) % column == 0) {
+        availableTA = [-1, -row, row]; //only right
+      } else if (currentIndex % column == 0) {
+        availableTA = [1, -row, row]; //only left
+      } else {
+        availableTA = [-1, 1, -row, row]; //not edge
+      }
+
+      for (int l = 0; l < availableTA.length; l++) {
+        buttonClickable[currentIndex + availableTA[l]] = true;
+      }
+      //tekrara düştü
+
     selectedLetters[currentIndex] = true;
     randomizeLetters();
   }
@@ -144,7 +174,7 @@ class _DropsSnakeState extends State<DropsSnake> {
     }
 
     currentWord = currentList[wordIndex];
-    setPuzzle();
+    //setPuzzle();
   }
 
   void selectList() {
@@ -161,22 +191,55 @@ class _DropsSnakeState extends State<DropsSnake> {
         }
         break;
     }
-    wordIndex = Random().nextInt(currentList.length-1);
+    wordIndex = Random().nextInt(currentList.length - 1);
     currentWord = currentList[wordIndex];
   }
 
-  void checkWord(int index) {
+  void checkWord(int gridIndex) {
+    List<int> availableTA;
     int inWord = selectedLetters.where((element) => element == true).length - 1;
-    if (randomizedLetters[index] != currentWord.name[inWord]) {
-      selectedLetters[index] = false;
+    if (randomizedLetters[gridIndex] != currentWord.name[inWord]) {
+      selectedLetters[gridIndex] = false;
       setState(() {});
       showSnackBar("try again", context);
     } else if (inWord == currentWord.name.length - 1) {
       showSnackBar("Correct!", context);
       changeWord('next');
-      selectedLetters.fillRange(0, selectedLetters.length - 1, false);
+      selectedLetters.fillRange(0, selectedLetters.length, false);
       randomizedLetters = List.generate(25, (index) => ' ');
       setPuzzle();
+      setState(() {});
+    } else {
+      buttonClickable.fillRange(0, buttonClickable.length , false);
+          // tekrara düştü
+        if (gridIndex < row) {
+        if ((gridIndex + 1) % column == 0) {
+          availableTA = [-1, row]; //top right
+        } else if (gridIndex % column == 0) {
+          availableTA = [1, row]; //top left
+        } else {
+          availableTA = [-1, 1, row]; //only top
+        }
+      } else if (gridIndex >= (row-1) * column) {
+        if ((gridIndex + 1) % column == 0) {
+          availableTA = [-1, -row]; //bottom right
+        } else if (gridIndex % column == 0) {
+          availableTA = [1, -row]; //bottom left
+        } else {
+          availableTA = [-1, 1, -row]; //only bottom
+        }
+      } else if ((gridIndex + 1) % column == 0) {
+        availableTA = [-1, -row, row]; //only right
+      } else if (gridIndex % column == 0) {
+        availableTA = [1, -row, row]; //only left
+      } else {
+        availableTA = [-1, 1, -row, row]; //not edge
+      }
+
+      for (int l = 0; l < availableTA.length ; l++) {
+        buttonClickable[gridIndex + availableTA[l]] = true;
+      }
+      //tekrara düştü
       setState(() {});
     }
   }
@@ -234,12 +297,13 @@ class _DropsSnakeState extends State<DropsSnake> {
                       return FloatingActionButton(
                         heroTag:
                             UniqueKey(), //birden fazla olunca karışmasın diye
-                        onPressed: () {
-                          selectedLetters[index] = true;
-                          
-                          checkWord(index);
-                          setState(() {});
-                        },
+                        onPressed: buttonClickable[index] == true
+                            ? () {
+                                selectedLetters[index] = true;
+                                checkWord(index);
+                                setState(() {});
+                              }
+                            : null,
                         backgroundColor: selectedLetters[index] == true
                             ? Colors.white.withOpacity(0.4)
                             : Colors.grey.withOpacity(0.4),
