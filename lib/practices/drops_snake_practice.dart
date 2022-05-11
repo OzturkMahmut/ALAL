@@ -30,6 +30,7 @@ class _DropsSnakeState extends State<DropsSnake> {
   List randomizedLetters = List.generate(25, (index) => ' '); //uzunluk 25
   List selectedLetters = List.generate(25, (index) => false);
   List buttonClickable = List.generate(25, (index) => false);
+  List<int> appointedWordIndexes = []; 
   int currentIndex = 0;
   int nextIndex = 0;
   late int startIndex;
@@ -48,109 +49,68 @@ class _DropsSnakeState extends State<DropsSnake> {
     super.initState();
   }
 
-  void randomizeLetters() {
+  void setPuzzle() {
+    List<int> availableForClick;
+    currentIndex = Random().nextInt(row * column); //24
+    startIndex = currentIndex;
+    appointedWordIndexes.add(startIndex);
+    randomizedLetters[currentIndex] = currentWord.name[0];
+    buttonClickable.fillRange(0, buttonClickable.length, false);
+    availableForClick = getNeigbourCells(currentIndex);
+    for (int l = 0; l < availableForClick.length; l++) {
+      buttonClickable[currentIndex + availableForClick[l]] = true;
+    }
+    selectedLetters[currentIndex] = true;
+    randomizeLetters();
+  }
+
+    void randomizeLetters() {
     List<int> available;
     int move;
 
     for (var j = 1; j < currentWord.name.length; j++) {
-      if (currentIndex < row) {
-        if ((currentIndex + 1) % column == 0) {
-          available = [-1, row]; //top right
-        } else if (currentIndex % column == 0) {
-          available = [1, row]; //top left
-        } else {
-          available = [-1, 1, row]; //only top
-        }
-      } else if (currentIndex >=(row-1) * column) {
-        if ((currentIndex + 1) % column == 0) {
-          available = [-1, -row]; //bottom right
-        } else if (currentIndex % column == 0) {
-          available = [1, -row]; //bottom left
-        } else {
-          available = [-1, 1, -row]; //only bottom
-        }
-      } else if ((currentIndex + 1) % column == 0) {
-        available = [-1, -row, row]; //only right
-      } else if (currentIndex % column == 0) {
-        available = [1, -row, row]; //only left
-      } else {
-        available = [-1, 1, -row, row]; //not edge
-      }
-
+      available = getNeigbourCells(currentIndex);
+      print("1: $appointedWordIndexes");
       for (int l = 0; l < available.length; l++) {
-        //kutular boş mu diye kontrol ediyor
-        if (randomizedLetters[currentIndex + available[l]] != " ") {
+        if ( randomizedLetters[currentIndex + available[l]] != " "|| appointedWordIndexes.contains(currentIndex + available[l])) {
+          //print("in");
           available.removeAt(l);
+          l--;
         }
       }
-
+      //print("av:$available");
       if (available.isNotEmpty) {
         move = available[
-            available.length == 1 ? 0 : Random().nextInt(available.length - 1)];
+            available.length == 1 ? 0 : Random().nextInt(available.length)];
+        //print("move: $move");
         nextIndex = currentIndex + move;
         randomizedLetters[nextIndex] = currentWord.name[j];
+        appointedWordIndexes.add(nextIndex);
         currentIndex = nextIndex;
       } else {
+        print("maybe?");
         //if there is no available next move, fill the current box and fall back
         randomizedLetters[currentIndex] =
-            _germanLetters[Random().nextInt(_germanLetters.length - 1)];
-        j--; //ya da -2
+            _germanLetters[Random().nextInt(_germanLetters.length)];
+        j -= 2; 
+        appointedWordIndexes.remove(currentIndex);
+        currentIndex = appointedWordIndexes.last;
       }
     }
+    print(appointedWordIndexes);
     for (var k = 0; k < randomizedLetters.length; k++) {
       //kelimeden sonra gridin geri kalanını doldurmak için
-      if (randomizedLetters[k] == " ") {
+      if (!appointedWordIndexes.contains(k)) { //k kelimenin indexlerinden değilse
         randomizedLetters[k] =
-            _germanLetters[Random().nextInt(_germanLetters.length - 1)];
+            _germanLetters[Random().nextInt(_germanLetters.length )];
       }
     }
     setState(() {});
   }
 
-  void setPuzzle() {
-    List<int> availableTA;
-    currentIndex = Random().nextInt(row * column - 1); //24
-    startIndex = currentIndex;
-    randomizedLetters[currentIndex] = currentWord.name[0];
-
-    // tekrara düştü
-    buttonClickable.fillRange(0, buttonClickable.length , false);
-        if (currentIndex < row) {
-        if ((currentIndex + 1) % column == 0) {
-          availableTA = [-1, row]; //top right
-        } else if (currentIndex % column == 0) {
-          availableTA = [1, row]; //top left
-        } else {
-          availableTA = [-1, 1, row]; //only top
-        }
-      } else if (currentIndex >= (row-1) * column) {
-        if ((currentIndex + 1) % column == 0) {
-          availableTA = [-1, -row]; //bottom right
-        } else if (currentIndex % column == 0) {
-          availableTA = [1, -row]; //bottom left
-        } else {
-          availableTA = [-1, 1, -row]; //only bottom
-        }
-      } else if ((currentIndex + 1) % column == 0) {
-        availableTA = [-1, -row, row]; //only right
-      } else if (currentIndex % column == 0) {
-        availableTA = [1, -row, row]; //only left
-      } else {
-        availableTA = [-1, 1, -row, row]; //not edge
-      }
-
-      for (int l = 0; l < availableTA.length; l++) {
-        buttonClickable[currentIndex + availableTA[l]] = true;
-      }
-      //tekrara düştü
-
-    selectedLetters[currentIndex] = true;
-    randomizeLetters();
-  }
-
   void changeWord(String direction) {
     if (!inOrder) {
-      wordIndex = Random().nextInt(currentList.length - 1);
+      wordIndex = Random().nextInt(currentList.length);
     } else {
       switch (direction) {
         case 'next':
@@ -191,57 +151,69 @@ class _DropsSnakeState extends State<DropsSnake> {
         }
         break;
     }
-    wordIndex = Random().nextInt(currentList.length - 1);
+    wordIndex = Random().nextInt(currentList.length );
     currentWord = currentList[wordIndex];
   }
 
   void checkWord(int gridIndex) {
-    List<int> availableTA;
-    int inWord = selectedLetters.where((element) => element == true).length - 1;
-    if (randomizedLetters[gridIndex] != currentWord.name[inWord]) {
+    List<int> availableForClick;
+    int inWordIndex = selectedLetters.where((element) => element == true).length - 1;
+    if (randomizedLetters[gridIndex] != currentWord.name[inWordIndex]) {
       selectedLetters[gridIndex] = false;
       setState(() {});
       showSnackBar("try again", context);
-    } else if (inWord == currentWord.name.length - 1) {
+    } else if (inWordIndex == currentWord.name.length - 1) {
       showSnackBar("Correct!", context);
       changeWord('next');
       selectedLetters.fillRange(0, selectedLetters.length, false);
       randomizedLetters = List.generate(25, (index) => ' ');
+      appointedWordIndexes.clear();
       setPuzzle();
       setState(() {});
-    } else {
-      buttonClickable.fillRange(0, buttonClickable.length , false);
-          // tekrara düştü
-        if (gridIndex < row) {
-        if ((gridIndex + 1) % column == 0) {
-          availableTA = [-1, row]; //top right
-        } else if (gridIndex % column == 0) {
-          availableTA = [1, row]; //top left
-        } else {
-          availableTA = [-1, 1, row]; //only top
-        }
-      } else if (gridIndex >= (row-1) * column) {
-        if ((gridIndex + 1) % column == 0) {
-          availableTA = [-1, -row]; //bottom right
-        } else if (gridIndex % column == 0) {
-          availableTA = [1, -row]; //bottom left
-        } else {
-          availableTA = [-1, 1, -row]; //only bottom
-        }
-      } else if ((gridIndex + 1) % column == 0) {
-        availableTA = [-1, -row, row]; //only right
-      } else if (gridIndex % column == 0) {
-        availableTA = [1, -row, row]; //only left
-      } else {
-        availableTA = [-1, 1, -row, row]; //not edge
+    } else if(randomizedLetters[gridIndex]==currentWord.name[inWordIndex]&&!appointedWordIndexes.sublist(inWordIndex+1).contains(gridIndex)&&(getNeigbourCells(gridIndex)).contains(appointedWordIndexes[inWordIndex+1]-gridIndex)) {  //doğru seçimse ve kelime bitmediyse
+      // (harf doğru ve index sonraki appointedalrdan biri değil ve bir sonraki index bu hücre için seçilebilir ise)
+      buttonClickable.fillRange(0, buttonClickable.length, false);
+      availableForClick = getNeigbourCells(gridIndex);
+      for (int l = 0; l < availableForClick.length; l++) {
+        buttonClickable[gridIndex + availableForClick[l]] = true;
       }
-
-      for (int l = 0; l < availableTA.length ; l++) {
-        buttonClickable[gridIndex + availableTA[l]] = true;
-      }
-      //tekrara düştü
       setState(() {});
     }
+    else { //harf doğru ancak şans eseri
+      selectedLetters[gridIndex] = false;
+      setState(() {});
+      showSnackBar("try again", context);
+    }
+  }
+
+  List<int> getNeigbourCells(currentGridIndex) {
+    List<int> neigbourCells;
+
+    if (currentGridIndex < row) {
+      if ((currentGridIndex + 1) % column == 0) {
+        neigbourCells = [-1, row]; //top right
+      } else if (currentGridIndex % column == 0) {
+        neigbourCells = [1, row]; //top left
+      } else {
+        neigbourCells = [-1, 1, row]; //only top
+      }
+    } else if (currentGridIndex >= (row - 1) * column) {
+      if ((currentGridIndex + 1) % column == 0) {
+        neigbourCells = [-1, -row]; //bottom right
+      } else if (currentGridIndex % column == 0) {
+        neigbourCells = [1, -row]; //bottom left
+      } else {
+        neigbourCells = [-1, 1, -row]; //only bottom
+      }
+    } else if ((currentGridIndex + 1) % column == 0) {
+      neigbourCells = [-1, -row, row]; //only right
+    } else if (currentGridIndex % column == 0) {
+      neigbourCells = [1, -row, row]; //only left
+    } else {
+      neigbourCells = [-1, 1, -row, row]; //not edge
+    }
+
+    return neigbourCells;
   }
 
   @override
